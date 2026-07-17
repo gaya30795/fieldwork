@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Fieldwork — Built for the work</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F4EF;
+    --ink:#201F1D;
+    --accent:#43503D;
+    --accent-soft:#E1E5D9;
+    --muted:#8B8578;
+    --line:#DCD8CE;
+    --rust:#B65C3D;
+    --white:#FFFFFF;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; background:var(--bg); color:var(--ink); font-family:'Work Sans', sans-serif; }
+  button { font-family:'Work Sans', sans-serif; }
+  button:focus-visible, [tabindex]:focus-visible, input:focus-visible, textarea:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce){ * { transition:none !important; animation:none !important; } }
+
+  header {
+    border-bottom: 1px solid var(--line);
+    padding: 18px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  .wordmark { font-family:'Fraunces', serif; font-weight:600; font-size:22px; letter-spacing:0.01em; cursor:pointer; }
+  .tagline { font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--muted); letter-spacing:0.08em; }
+  #cart-btn { background:none; border:none; cursor:pointer; position:relative; display:flex; align-items:center; color:var(--ink); padding:0; }
+  #cart-count {
+    position:absolute; top:-6px; right:-8px; background:var(--rust); color:var(--white);
+    font-size:10px; font-family:'IBM Plex Mono', monospace; border-radius:50%; width:16px; height:16px;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  main { max-width: 1100px; margin:0 auto; padding: 48px 28px 80px; }
+  .eyebrow { font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--rust); letter-spacing:0.08em; margin-bottom:10px; }
+  h1.hero { font-family:'Fraunces', serif; font-weight:500; font-size:clamp(32px, 5vw, 52px); line-height:1.05; margin:0; max-width:640px; }
+  .sub { color:var(--muted); font-size:15px; margin-top:14px; max-width:480px; }
+
+  .chips { display:flex; gap:8px; margin: 28px 0; flex-wrap:wrap; }
+  .fw-chip {
+    font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.04em; padding:7px 14px;
+    border-radius:999px; border:1px solid var(--line); background:transparent; color:var(--muted); cursor:pointer; white-space:nowrap;
+  }
+  .fw-chip.active { background:var(--ink); border-color:var(--ink); color:var(--bg); }
+
+  .fw-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:20px; }
+  .tag-card {
+    position:relative; background:var(--white); border:1px solid var(--line); border-radius:4px;
+    padding:22px 18px 16px; cursor:pointer; transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+  }
+  .tag-card:hover { border-color:var(--accent); transform:translateY(-3px); box-shadow:0 10px 24px rgba(32,31,29,0.08); }
+  .tag-hole { position:absolute; top:10px; left:10px; width:10px; height:10px; border-radius:50%; background:var(--bg); border:1px solid var(--line); }
+  .tag-icon-wrap { width:100%; height:120px; display:flex; align-items:center; justify-content:center; padding:6px 24px; }
+  .tag-icon-wrap svg { width:84px; height:84px; }
+  .tag-info { border-top:1px dashed var(--line); margin-top:14px; padding-top:10px; transition:border-color 160ms ease; }
+  .tag-card:hover .tag-info { border-top-color:var(--accent); }
+  .tag-no { font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:0.06em; color:var(--muted); margin-bottom:4px; }
+  .tag-name { font-family:'Fraunces', serif; font-size:17px; font-weight:500; margin-bottom:6px; line-height:1.2; }
+  .tag-price { font-family:'IBM Plex Mono', monospace; font-size:14px; letter-spacing:0.03em; }
+
+  .back-link {
+    background:none; border:none; cursor:pointer; display:flex; align-items:center; gap:6px;
+    color:var(--muted); font-size:13px; margin-bottom:28px; padding:0;
+  }
+
+  .detail-grid { display:grid; grid-template-columns: 1fr 1fr; gap:48px; }
+  @media (max-width: 760px){ .detail-grid { grid-template-columns: 1fr; } }
+  .detail-image {
+    background:var(--white); border:1px solid var(--line); border-radius:4px;
+    display:flex; align-items:center; justify-content:center; min-height:340px; padding:40px;
+  }
+  .detail-image svg { width:220px; height:220px; }
+  .detail-eyebrow { font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--muted); letter-spacing:0.06em; margin-bottom:8px; }
+  .detail-title { font-family:'Fraunces', serif; font-weight:500; font-size:32px; margin:0 0 12px; }
+  .detail-price { font-family:'IBM Plex Mono', monospace; font-size:20px; margin-bottom:20px; }
+  .detail-desc { color:var(--muted); font-size:15px; line-height:1.6; margin-bottom:28px; max-width:420px; }
+  .size-label { font-size:12px; letter-spacing:0.06em; color:var(--muted); margin-bottom:10px; }
+  .size-row { display:flex; gap:8px; margin-bottom:24px; }
+  .size-btn {
+    width:42px; height:42px; border-radius:3px; border:1px solid var(--line); background:var(--white);
+    color:var(--ink); font-size:13px; cursor:pointer;
+  }
+  .size-btn.active { border-color:var(--ink); background:var(--ink); color:var(--bg); }
+
+  .fw-primary-btn {
+    background:var(--ink); color:var(--bg); border:none; border-radius:3px; padding:13px 20px;
+    font-size:14px; font-weight:500; cursor:pointer; letter-spacing:0.02em; transition:background 140ms ease;
+  }
+  .fw-primary-btn:hover { background:var(--accent); }
+  .fw-primary-btn:disabled { background:var(--line); color:var(--muted); cursor:not-allowed; }
+  .fw-primary-btn.full { width:100%; }
+
+  input, textarea {
+    font-family:'Work Sans', sans-serif; border:1px solid var(--line); border-radius:3px; padding:10px 12px;
+    font-size:14px; background:var(--white); color:var(--ink); width:100%;
+  }
+  .field-label { font-size:12px; color:var(--muted); margin-bottom:6px; }
+  .checkout-wrap { max-width:520px; margin:0 auto; padding:36px 28px 80px; }
+  .checkout-form { display:flex; flex-direction:column; gap:14px; }
+  .summary-row { display:flex; justify-content:space-between; font-size:14px; margin-bottom:6px; color:var(--muted); }
+  .summary-total { display:flex; justify-content:space-between; font-size:17px; font-weight:500; margin-top:10px; }
+  .mono { font-family:'IBM Plex Mono', monospace; }
+
+  .confirm-wrap { max-width:480px; margin:0 auto; padding:80px 28px; text-align:center; }
+  .check-circle {
+    width:56px; height:56px; border-radius:50%; background:var(--accent-soft);
+    display:flex; align-items:center; justify-content:center; margin:0 auto 24px;
+  }
+
+  /* Cart drawer */
+  #overlay { position:fixed; inset:0; background:rgba(32,31,29,0.35); z-index:20; display:none; }
+  #overlay.open { display:block; }
+  #drawer {
+    position:absolute; right:0; top:0; bottom:0; width:min(380px, 92vw); background:var(--bg);
+    border-left:1px solid var(--line); display:flex; flex-direction:column; padding:22px 22px 0;
+  }
+  .drawer-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+  .drawer-title { font-family:'Fraunces', serif; font-size:20px; font-weight:500; }
+  #close-cart { background:none; border:none; cursor:pointer; color:var(--ink); padding:0; }
+  #cart-items { flex:1; overflow-y:auto; }
+  .empty-cart { color:var(--muted); font-size:14px; margin-top:40px; text-align:center; }
+  .cart-item { display:flex; gap:12px; padding-bottom:16px; margin-bottom:16px; border-bottom:1px dashed var(--line); }
+  .cart-thumb {
+    width:56px; height:56px; background:var(--white); border:1px solid var(--line); border-radius:3px;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0; padding:8px;
+  }
+  .cart-thumb svg { width:100%; height:100%; }
+  .cart-item-name { font-size:14px; font-weight:500; }
+  .cart-item-meta { font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--muted); margin-bottom:6px; }
+  .qty-row { display:flex; align-items:center; gap:10px; }
+  .qty-btn {
+    background:none; border:1px solid var(--line); border-radius:3px; cursor:pointer; width:22px; height:22px;
+    display:flex; align-items:center; justify-content:center; padding:0;
+  }
+  .remove-link { background:none; border:none; color:var(--muted); font-size:12px; cursor:pointer; margin-left:auto; text-decoration:underline; padding:0; }
+  #cart-footer { border-top:1px solid var(--line); padding:18px 0 22px; }
+
+  .view { display:none; }
+  .view.active { display:block; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wordmark" id="brand-link">FIELDWORK</div>
+  <div class="tagline" id="tagline">BUILT FOR THE WORK</div>
+  <button id="cart-btn" aria-label="Open cart">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+    <span id="cart-count" style="display:none;">0</span>
+  </button>
+</header>
+
+<!-- SHOP VIEW -->
+<main class="view active" id="view-shop">
+  <div class="eyebrow">NEW STOCK — FALL RUN</div>
+  <h1 class="hero">Clothes built for the work, worn every day.</h1>
+  <p class="sub">Eight pieces. No seasons to chase. Each one numbered like the tag it ships with.</p>
+
+  <div class="chips" id="chips"></div>
+  <div class="fw-grid" id="product-grid"></div>
+</main>
+
+<!-- DETAIL VIEW -->
+<main class="view" id="view-detail" style="max-width:900px;">
+  <button class="back-link" id="back-to-shop-1">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    BACK TO SHOP
+  </button>
+  <div class="detail-grid">
+    <div class="detail-image" id="detail-image"></div>
+    <div>
+      <div class="detail-eyebrow" id="detail-eyebrow"></div>
+      <h2 class="detail-title" id="detail-name"></h2>
+      <div class="detail-price mono" id="detail-price"></div>
+      <p class="detail-desc" id="detail-desc"></p>
+      <div class="size-label">SIZE</div>
+      <div class="size-row" id="size-row"></div>
+      <button class="fw-primary-btn full" id="add-to-cart-btn">ADD TO BAG</button>
+    </div>
+  </div>
+</main>
+
+<!-- CHECKOUT VIEW -->
+<main class="view checkout-wrap" id="view-checkout">
+  <button class="back-link" id="back-to-shop-2">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    CONTINUE SHOPPING
+  </button>
+  <h2 class="detail-title" style="font-size:28px;">Checkout</h2>
+  <form class="checkout-form" id="checkout-form">
+    <div>
+      <div class="field-label">FULL NAME</div>
+      <input required type="text" id="cust-name" placeholder="Jordan Rivera" />
+    </div>
+    <div>
+      <div class="field-label">EMAIL</div>
+      <input required type="email" id="cust-email" placeholder="you@example.com" />
+    </div>
+    <div>
+      <div class="field-label">SHIPPING ADDRESS</div>
+      <textarea required rows="3" id="cust-address" placeholder="Street, city, postal code"></textarea>
+    </div>
+    <div style="border-top:1px dashed var(--line); margin-top:10px; padding-top:16px;">
+      <div class="summary-row"><span>Subtotal</span><span class="mono" id="checkout-subtotal">$0.00</span></div>
+      <div class="summary-row"><span>Shipping</span><span class="mono">Free</span></div>
+      <div class="summary-total"><span>Total</span><span class="mono" id="checkout-total">$0.00</span></div>
+    </div>
+    <button type="submit" class="fw-primary-btn" id="place-order-btn" style="margin-top:12px;">PLACE ORDER</button>
+  </form>
+</main>
+
+<!-- CONFIRMATION VIEW -->
+<main class="view confirm-wrap" id="view-confirmed">
+  <div class="check-circle">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#43503D" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg>
+  </div>
+  <h2 class="detail-title" style="font-size:28px;">Order placed.</h2>
+  <p class="sub" style="margin:0 auto 4px;">Order <span class="mono" id="order-no" style="color:var(--ink);"></span> is confirmed.</p>
+  <p class="sub" style="margin:0 auto 32px;">A receipt is on its way to your inbox.</p>
+  <button class="fw-primary-btn" id="continue-shopping-btn">CONTINUE SHOPPING</button>
+</main>
+
+<!-- CART DRAWER -->
+<div id="overlay">
+  <div id="drawer" onclick="event.stopPropagation()">
+    <div class="drawer-head">
+      <div class="drawer-title">Your Bag</div>
+      <button id="close-cart" aria-label="Close cart">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div id="cart-items"></div>
+    <div id="cart-footer" style="display:none;">
+      <div class="summary-row" style="font-size:15px; margin-bottom:14px;"><span>Subtotal</span><span class="mono" id="drawer-subtotal" style="font-weight:500;">$0.00</span></div>
+      <button class="fw-primary-btn full" id="checkout-btn">CHECKOUT</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------- Icons ---------- */
+const ICONS = {
+  jacket: (color) => `<svg viewBox="0 0 100 100"><path d="M50 12 L38 20 L20 26 L14 52 L24 56 L28 38 L30 88 L70 88 L72 38 L76 56 L86 52 L80 26 L62 20 Z" fill="none" stroke="${color}" stroke-width="2.2" stroke-linejoin="round"/><path d="M50 12 L44 24 L50 32 L56 24 Z" fill="none" stroke="${color}" stroke-width="2"/><line x1="50" y1="32" x2="50" y2="86" stroke="${color}" stroke-width="1.2" stroke-dasharray="3 3"/></svg>`,
+  trouser: (color) => `<svg viewBox="0 0 100 100"><path d="M28 14 H72 L74 32 L80 88 L64 88 L54 40 L46 88 L30 88 L36 32 Z" fill="none" stroke="${color}" stroke-width="2.2" stroke-linejoin="round"/><line x1="28" y1="24" x2="72" y2="24" stroke="${color}" stroke-width="1.2"/></svg>`,
+  tee: (color) => `<svg viewBox="0 0 100 100"><path d="M36 16 L50 24 L64 16 L86 28 L78 44 L68 38 L68 88 L32 88 L32 38 L22 44 L14 28 Z" fill="none" stroke="${color}" stroke-width="2.2" stroke-linejoin="round"/></svg>`,
+  cap: (color) => `<svg viewBox="0 0 100 100"><path d="M20 58 A30 26 0 0 1 80 58" fill="none" stroke="${color}" stroke-width="2.2"/><path d="M20 58 Q50 70 80 58" fill="none" stroke="${color}" stroke-width="2.2"/><path d="M78 56 Q94 56 94 64 Q80 66 76 60Z" fill="none" stroke="${color}" stroke-width="2"/><circle cx="50" cy="40" r="2" fill="${color}"/></svg>`,
+  tote: (color) => `<svg viewBox="0 0 100 100"><path d="M26 38 H74 L70 86 H30 Z" fill="none" stroke="${color}" stroke-width="2.2" stroke-linejoin="round"/><path d="M36 38 V26 A14 14 0 0 1 64 26 V38" fill="none" stroke="${color}" stroke-width="2.2"/></svg>`,
+  apron: (color) => `<svg viewBox="0 0 100 100"><path d="M32 18 H68 V34 L60 40 L64 88 H36 L40 40 L32 34 Z" fill="none" stroke="${color}" stroke-width="2.2" stroke-linejoin="round"/><path d="M32 22 Q16 22 16 40" fill="none" stroke="${color}" stroke-width="1.6"/><path d="M68 22 Q84 22 84 40" fill="none" stroke="${color}" stroke-width="1.6"/></svg>`,
+};
+
+const COLORS = { accent:"#43503D", ink:"#201F1D", rust:"#B65C3D" };
+
+const PRODUCTS = [
+  { id:1, no:"01", name:"Waxed Field Jacket", category:"Outerwear", price:228, color:COLORS.accent, colorName:"Moss", icon:"jacket", desc:"Waxed cotton canvas shell built to shed weather. Corduroy collar, brass hardware, two chest pockets sized for a notebook." },
+  { id:2, no:"02", name:"Canvas Work Trouser", category:"Bottoms", price:148, color:"#A9A28E", colorName:"Stone", icon:"trouser", desc:"Heavyweight cotton canvas with a relaxed straight leg. Double knee, hammer loop, reinforced seat." },
+  { id:3, no:"03", name:"Merino Tee", category:"Tops", price:68, color:COLORS.ink, colorName:"Ink", icon:"tee", desc:"17.5 micron merino, worn next to skin. Regulates temperature, resists odor, holds its shape wash after wash." },
+  { id:4, no:"04", name:"Wool Overshirt", category:"Tops", price:168, color:COLORS.rust, colorName:"Rust", icon:"jacket", desc:"A shirt heavy enough to work as a light jacket. Brushed wool-blend, flap pockets, bone buttons." },
+  { id:5, no:"05", name:"Selvedge Denim", category:"Bottoms", price:178, color:"#33415C", colorName:"Indigo", icon:"trouser", desc:"13oz Japanese selvedge, rope-dyed. Cut straight, built to fade with wear, not with washing." },
+  { id:6, no:"06", name:"Waxed Cap", category:"Accessories", price:58, color:COLORS.accent, colorName:"Moss", icon:"cap", desc:"Six-panel cap in the same waxed canvas as the field jacket. Low profile, leather strap back." },
+  { id:7, no:"07", name:"Canvas Tote", category:"Accessories", price:78, color:"#A9A28E", colorName:"Stone", icon:"tote", desc:"22oz canvas tote with a flat bottom and reinforced handles. Holds a full day of groceries or gear." },
+  { id:8, no:"08", name:"Shop Apron", category:"Outerwear", price:118, color:COLORS.ink, colorName:"Ink", icon:"apron", desc:"Cross-back canvas apron with a pencil pocket and adjustable ties. Built for the bench, not the kitchen." },
+];
+const CATEGORIES = ["All","Outerwear","Tops","Bottoms","Accessories"];
+const SIZES = ["S","M","L","XL"];
+
+/* ---------- State ---------- */
+let activeCategory = "All";
+let cart = []; // {id, size, qty}
+let selectedProduct = null;
+let selectedSize = "M";
+
+const money = (n) => `$${n.toFixed(2)}`;
+const findProduct = (id) => PRODUCTS.find(p => p.id === id);
+
+/* ---------- View switching ---------- */
+function showView(name){
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  document.getElementById("view-" + name).classList.add("active");
+  window.scrollTo(0,0);
+}
+
+/* ---------- Render: chips ---------- */
+function renderChips(){
+  const wrap = document.getElementById("chips");
+  wrap.innerHTML = "";
+  CATEGORIES.forEach(c => {
+    const btn = document.createElement("button");
+    btn.className = "fw-chip" + (c === activeCategory ? " active" : "");
+    btn.textContent = c.toUpperCase();
+    btn.onclick = () => { activeCategory = c; renderChips(); renderGrid(); };
+    wrap.appendChild(btn);
+  });
+}
+
+/* ---------- Render: product grid ---------- */
+function renderGrid(){
+  const grid = document.getElementById("product-grid");
+  grid.innerHTML = "";
+  const list = activeCategory === "All" ? PRODUCTS : PRODUCTS.filter(p => p.category === activeCategory);
+  list.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "tag-card";
+    card.innerHTML = `
+      <div class="tag-hole"></div>
+      <div class="tag-icon-wrap">${ICONS[p.icon](p.color)}</div>
+      <div class="tag-info">
+        <div class="tag-no">NO. ${p.no} — ${p.colorName.toUpperCase()}</div>
+        <div class="tag-name">${p.name}</div>
+        <div class="tag-price">${money(p.price)}</div>
+      </div>`;
+    card.onclick = () => openProduct(p.id);
+    grid.appendChild(card);
+  });
+}
+
+/* ---------- Render: detail ---------- */
+function openProduct(id){
+  selectedProduct = findProduct(id);
+  selectedSize = "M";
+  const p = selectedProduct;
+  document.getElementById("detail-image").innerHTML = ICONS[p.icon](p.color);
+  document.getElementById("detail-eyebrow").textContent = `NO. ${p.no} — ${p.colorName.toUpperCase()} — ${p.category.toUpperCase()}`;
+  document.getElementById("detail-name").textContent = p.name;
+  document.getElementById("detail-price").textContent = money(p.price);
+  document.getElementById("detail-desc").textContent = p.desc;
+  renderSizeRow();
+  showView("detail");
+}
+
+function renderSizeRow(){
+  const row = document.getElementById("size-row");
+  row.innerHTML = "";
+  SIZES.forEach(s => {
+    const btn = document.createElement("button");
+    btn.className = "size-btn" + (s === selectedSize ? " active" : "");
+    btn.textContent = s;
+    btn.onclick = () => { selectedSize = s; renderSizeRow(); };
+    row.appendChild(btn);
+  });
+}
+
+document.getElementById("add-to-cart-btn").onclick = () => {
+  addToCart(selectedProduct.id, selectedSize, 1);
+  openCart();
+};
+
+/* ---------- Cart logic ---------- */
+function addToCart(id, size, qty){
+  const existing = cart.find(c => c.id === id && c.size === size);
+  if (existing) existing.qty += qty;
+  else cart.push({ id, size, qty });
+  renderCart();
+}
+function updateQty(id, size, delta){
+  const item = cart.find(c => c.id === id && c.size === size);
+  if (!item) return;
+  item.qty += delta;
+  cart = cart.filter(c => c.qty > 0);
+  renderCart();
+}
+function removeItem(id, size){
+  cart = cart.filter(c => !(c.id === id && c.size === size));
+  renderCart();
+}
+function cartSubtotal(){
+  return cart.reduce((sum, c) => sum + findProduct(c.id).price * c.qty, 0);
+}
+function cartCount(){
+  return cart.reduce((sum, c) => sum + c.qty, 0);
+}
+
+function renderCart(){
+  const count = cartCount();
+  const countEl = document.getElementById("cart-count");
+  countEl.style.display = count > 0 ? "flex" : "none";
+  countEl.textContent = count;
+
+  const itemsWrap = document.getElementById("cart-items");
+  const footer = document.getElementById("cart-footer");
+  itemsWrap.innerHTML = "";
+
+  if (cart.length === 0){
+    itemsWrap.innerHTML = `<div class="empty-cart">Nothing in your bag yet.</div>`;
+    footer.style.display = "none";
+    return;
+  }
+
+  footer.style.display = "block";
+  cart.forEach(c => {
+    const p = findProduct(c.id);
+    const row = document.createElement("div");
+    row.className = "cart-item";
+    row.innerHTML = `
+      <div class="cart-thumb">${ICONS[p.icon](p.color)}</div>
+      <div style="flex:1;">
+        <div class="cart-item-name">${p.name}</div>
+        <div class="cart-item-meta">SIZE ${c.size} — ${money(p.price)}</div>
+        <div class="qty-row">
+          <button class="qty-btn" data-action="dec">−</button>
+          <span class="mono" style="font-size:13px;">${c.qty}</span>
+          <button class="qty-btn" data-action="inc">+</button>
+          <button class="remove-link" data-action="remove">Remove</button>
+        </div>
+      </div>`;
+    row.querySelector('[data-action="dec"]').onclick = () => updateQty(c.id, c.size, -1);
+    row.querySelector('[data-action="inc"]').onclick = () => updateQty(c.id, c.size, 1);
+    row.querySelector('[data-action="remove"]').onclick = () => removeItem(c.id, c.size);
+    itemsWrap.appendChild(row);
+  });
+
+  document.getElementById("drawer-subtotal").textContent = money(cartSubtotal());
+}
+
+/* ---------- Cart drawer open/close ---------- */
+function openCart(){ document.getElementById("overlay").classList.add("open"); }
+function closeCart(){ document.getElementById("overlay").classList.remove("open"); }
+document.getElementById("cart-btn").onclick = openCart;
+document.getElementById("close-cart").onclick = closeCart;
+document.getElementById("overlay").onclick = closeCart;
+
+/* ---------- Checkout ---------- */
+document.getElementById("checkout-btn").onclick = () => {
+  closeCart();
+  document.getElementById("checkout-subtotal").textContent = money(cartSubtotal());
+  document.getElementById("checkout-total").textContent = money(cartSubtotal());
+  document.getElementById("place-order-btn").disabled = cart.length === 0;
+  showView("checkout");
+};
+
+document.getElementById("checkout-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const orderNo = "FW-" + Math.floor(10000 + Math.random() * 90000);
+  document.getElementById("order-no").textContent = orderNo;
+  cart = [];
+  renderCart();
+  showView("confirmed");
+});
+
+/* ---------- Navigation ---------- */
+document.getElementById("brand-link").onclick = () => showView("shop");
+document.getElementById("back-to-shop-1").onclick = () => showView("shop");
+document.getElementById("back-to-shop-2").onclick = () => showView("shop");
+document.getElementById("continue-shopping-btn").onclick = () => showView("shop");
+
+/* ---------- Responsive tagline ---------- */
+function updateTagline(){
+  document.getElementById("tagline").style.display = window.innerWidth < 640 ? "none" : "block";
+}
+window.addEventListener("resize", updateTagline);
+updateTagline();
+
+/* ---------- Init ---------- */
+renderChips();
+renderGrid();
+renderCart();
+</script>
+
+</body>
+</html>
